@@ -1,0 +1,129 @@
+﻿Build1=Default,nl.pdeg.clubpos
+File1=appSettings.bal
+File2=basePrefDialog.json
+File3=btw.json
+File4=btwTarief.bal
+File5=clubpos.db
+File6=clvBtw.bal
+File7=MainPage.bal
+File8=materialdesignicons-webfont.ttf
+FileGroup1=Default Group
+FileGroup2=data
+FileGroup3=data
+FileGroup4=btw
+FileGroup5=data
+FileGroup6=btw
+FileGroup7=Default Group
+FileGroup8=Default Group
+Group=Default Group
+Library1=core
+Library10=b4xpreferencesdialog
+Library2=b4xpages
+Library3=xui views
+Library4=runtimepermissions
+Library5=b4xencryption
+Library6=stringutils
+Library7=sql
+Library8=ime
+Library9=randomaccessfile
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="21" android:targetSdkVersion="29"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~~\n~SetActivityAttribute(Main, android:windowSoftInputMode, adjustResize|stateHidden)
+Module1=appSetting
+Module2=|relative|..\B4XMainPage
+Module3=BtwInvoer
+Module4=ClassFunction
+Module5=ClassPassWord
+Module6=DbUtils
+Module7=Starter
+NumberOfFiles=8
+NumberOfLibraries=10
+NumberOfModules=7
+Version=10.2
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel:Club Pos
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: portrait
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: false
+	
+#End Region
+
+Sub Process_Globals
+	Public ActionBarHomeClicked As Boolean
+	Public rp As RuntimePermissions
+	Public filePath As String
+End Sub
+
+Sub Globals
+	Private ime As IME
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	ime.Initialize("IME")
+	ime.AddHeightChangedEvent
+	
+	Dim pm As B4XPagesManager
+	Dim fp() As String 
+	pm.Initialize(Activity)
+	fp = rp.GetAllSafeDirsExternal("")
+	filePath = fp(0)
+	
+	CheckDatabase
+End Sub
+
+Sub CheckDatabase
+	If File.Exists(filePath, "clubpos.db") = False Then
+		File.Copy(File.DirAssets, "clubpos.db", filePath, "clubpos.db")
+	End If
+		
+End Sub
+
+Sub IME_HeightChanged (NewHeight As Int, OldHeight As Int)
+	B4XPages.GetManager.RaiseEvent(B4XPages.GetManager.GetTopPage, "IME_HeightChanged", Array(NewHeight, OldHeight))
+End Sub
+
+'Template version: B4A-1.01
+#Region Delegates
+
+Sub Activity_ActionBarHomeClick
+	ActionBarHomeClicked = True
+	B4XPages.Delegate.Activity_ActionBarHomeClick
+	ActionBarHomeClicked = False
+End Sub
+
+Sub Activity_KeyPress (KeyCode As Int) As Boolean
+	Return B4XPages.Delegate.Activity_KeyPress(KeyCode)
+End Sub
+
+Sub Activity_Resume
+	B4XPages.Delegate.Activity_Resume
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+	B4XPages.Delegate.Activity_Pause
+End Sub
+
+Sub Activity_PermissionResult (Permission As String, Result As Boolean)
+	B4XPages.Delegate.Activity_PermissionResult(Permission, Result)
+End Sub
+
+Sub Create_Menu (Menu As Object)
+	B4XPages.Delegate.Create_Menu(Menu)
+End Sub
+
+#if Java
+public boolean _onCreateOptionsMenu(android.view.Menu menu) {
+	 processBA.raiseEvent(null, "create_menu", menu);
+	 return true;
+	
+}
+#End If
+#End Region
+
+'Program code should go into B4XMainPage and other pages.

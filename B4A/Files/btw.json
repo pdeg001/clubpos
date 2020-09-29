@@ -1,0 +1,18 @@
+{
+    "Version": 1.65,
+    "Theme": "Light Theme",
+    "Items": [
+        {
+            "title": "Omschrijving",
+            "type": "Text",
+            "key": "btw_omschrijving",
+            "required": true
+        },
+        {
+            "title": "Tarief",
+            "type": "Decimal Number",
+            "key": "btw_tarief",
+            "required": true
+        }
+    ]
+}
