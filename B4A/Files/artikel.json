@@ -1,0 +1,24 @@
+{
+    "Version": 1.65,
+    "Theme": "Light Theme",
+    "Items": [
+        {
+            "title": "Omschrijving",
+            "type": "Text",
+            "key": "oms",
+            "required": true
+        },
+        {
+            "title": "Prijs ex.",
+            "type": "Decimal Number",
+            "key": "price",
+            "required": true
+        },
+        {
+           "title": "BTW",
+            "type": "Options",
+            "key": "btw",
+            "required": true
+        }
+    ]
+}

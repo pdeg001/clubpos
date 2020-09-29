@@ -1,23 +1,30 @@
 ﻿Build1=Default,nl.pdeg.clubpos
 File1=appSettings.bal
-File2=basePrefDialog.json
-File3=btw.json
-File4=btwTarief.bal
-File5=clubpos.db
-File6=clvBtw.bal
-File7=MainPage.bal
-File8=materialdesignicons-webfont.ttf
+File10=materialdesignicons-webfont.ttf
+File11=product.bal
+File2=artikel.json
+File3=basePrefDialog.json
+File4=btw.json
+File5=btwTarief.bal
+File6=clubpos.db
+File7=clvBtw.bal
+File8=clvProduct.bal
+File9=MainPage.bal
 FileGroup1=Default Group
+FileGroup10=Default Group
+FileGroup11=product
 FileGroup2=data
 FileGroup3=data
-FileGroup4=btw
-FileGroup5=data
-FileGroup6=btw
-FileGroup7=Default Group
-FileGroup8=Default Group
+FileGroup4=data
+FileGroup5=btw
+FileGroup6=data
+FileGroup7=btw
+FileGroup8=product
+FileGroup9=Default Group
 Group=Default Group
 Library1=core
 Library10=b4xpreferencesdialog
+Library11=json
 Library2=b4xpages
 Library3=xui views
 Library4=runtimepermissions
@@ -33,10 +40,11 @@ Module3=BtwInvoer
 Module4=ClassFunction
 Module5=ClassPassWord
 Module6=DbUtils
-Module7=Starter
-NumberOfFiles=8
-NumberOfLibraries=10
-NumberOfModules=7
+Module7=product
+Module8=Starter
+NumberOfFiles=11
+NumberOfLibraries=11
+NumberOfModules=8
 Version=10.2
 @EndOfDesignText@
 #Region  Project Attributes 
@@ -62,9 +70,11 @@ End Sub
 
 Sub Globals
 	Private ime As IME
+	Private clsDb As DbUtils
 End Sub
 
 Sub Activity_Create(FirstTime As Boolean)
+	
 	ime.Initialize("IME")
 	ime.AddHeightChangedEvent
 	
@@ -75,6 +85,7 @@ Sub Activity_Create(FirstTime As Boolean)
 	filePath = fp(0)
 	
 	CheckDatabase
+	clsDb.Initialize
 End Sub
 
 Sub CheckDatabase

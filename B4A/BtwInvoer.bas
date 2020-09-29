@@ -9,7 +9,7 @@ Sub Class_Globals
 	Private xui As XUI 'ignore
 	Private prefdialog As PreferencesDialog 'ignore
 	Private ime As IME
-	Private Options As Map
+	Private options As Map
 	Private clsDb As DbUtils
 	Private clsFunc As ClassFunction
 	Private editRate As Boolean
@@ -49,17 +49,16 @@ End Sub
 'You can see the list of page related events in the B4XPagesManager object. The event name is B4XPage.
 
 Sub btnAdd_Click
-	prefdialog.Initialize(Root, "BTW Tarieven", 300dip, 300dip)
-	prefdialog.LoadFromJson(File.ReadString(File.DirAssets, "btw.json"))
-	Options.Initialize
-	Dim sf As Object = prefdialog.ShowDialog(Options, "OKE", "ANNULEER")
+	InitPrefDialog
+	options.Initialize
+	Dim sf As Object = prefdialog.ShowDialog(options, "OKE", "ANNULEER")
 	clsFunc.PrefDialogCustom(prefdialog)
 	
 	'Wait For (prefdialog.ShowDialog(Options, "OKE", "ANNULEER")) Complete (Result As Int)
 	Wait For (sf) Complete (Result As Int)
 	
 	If Result = xui.DialogResponse_Positive Then
-		ProcessBtw(Options)
+		ProcessBtw(options)
 	End If
 End Sub
 
@@ -74,10 +73,10 @@ Sub ProcessBtw (OptionsPassed As Map)
 	
 	For Each key As String In OptionsPassed.Keys
 		If key = "btw_omschrijving" Then
-			lst.Add(Options.Get(key))
+			lst.Add(options.Get(key))
 		End If
 		If key = "btw_tarief" Then
-			lst.Add(Options.Get(key))
+			lst.Add(options.Get(key))
 		End If
 	Next
 	
@@ -164,19 +163,29 @@ Sub lblEdit_Click
 		End If
 	End If
 	
-	Options.Initialize
-	Options = CreateMap("btw_omschrijving":descr,"btw_tarief":rate)
+	options.Initialize
+	options = CreateMap("btw_omschrijving":descr,"btw_tarief":rate)
 	
-	prefdialog.Initialize(Root, "BTW Tarieven", 300dip, 300dip)
-	prefdialog.LoadFromJson(File.ReadString(File.DirAssets, "btw.json"))
+	InitPrefDialog
 	
-	Dim sf As Object = prefdialog.ShowDialog(Options, "OK", "CANCEL")
+	Dim sf As Object = prefdialog.ShowDialog(options, "OKE", "ANNULEER")
 	clsFunc.PrefDialogCustom(prefdialog)
 
 	Wait For (sf) Complete (Result As Int)
 	
 	If Result = xui.DialogResponse_Positive Then
-		ProcessBtw(Options)
+		ProcessBtw(options)
 	End If
-	
+End Sub
+
+Sub InitPrefDialog
+	Dim dip As Int
+	If clsFunc.GetDevicePhysicalSize > 6 Then
+		dip = 400dip
+	Else
+		dip = 300dip
+	End If
+	'prefdialog.Initialize(Root, "BTW Tarieven", 300dip, 300dip)
+	prefdialog.Initialize(Root, "BTW Tarieven", dip, 300dip)
+	prefdialog.LoadFromJson(File.ReadString(File.DirAssets, "btw.json"))
 End Sub

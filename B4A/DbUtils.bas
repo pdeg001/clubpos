@@ -12,8 +12,8 @@ End Sub
 
 'Initializes the object. You can add parameters to this method if needed.
 Public Sub Initialize
-	
 	DbInitalized
+	CheckArticleTableExists
 End Sub
 
 Private Sub DbInitalized
@@ -21,7 +21,6 @@ Private Sub DbInitalized
 		sql.Initialize(Main.filePath, "clubpos.db", False)
 	End If
 End Sub
-
 
 #Region BTW
 Public Sub AddBtw(lst As List) As List
@@ -67,6 +66,75 @@ Public Sub UpdateBtw(id As String, descr As String, rate As String)
 	sql.ExecNonQuery2(qry, Array As String(descr, rate, id))
 End Sub
 
+Public Sub GetAllBtwForAddProduct
+	Dim btw As String
+	
+	DbInitalized
+	
+	qry = "SELECT omschrijving FROM btw_tarief ORDER BY tarief"
+	curs = sql.ExecQuery(qry)
+	
+	For i = 0 To curs.RowCount -1
+		curs.Position = i
+		If i < curs.RowCount Then
+			btw = btw &curs.GetString("omschrijving")&CRLF
+		Else
+			btw = btw &curs.GetString("omschrijving")
+		End If
+		
+	Next
+	File.WriteString(Main.filePath, "btw.txt", btw)
+	Sleep(100)
+End Sub
+
+#End Region
+
+#Region PRODUCT
+Public Sub AddProduct(descr As String, price As String, btw As String) As List
+	DbInitalized
+	Dim id As String = UUIDv4
+	Dim lst As List
+	
+	qry = "INSERT INTO artikel (id, omschrijving, prijs_ex_btw, btw_perc) VALUES(?,?,?,?)"
+	sql.ExecNonQuery2(qry, Array As String(id, descr, price, btw))
+	
+	lst.Initialize
+	lst.Add(CreateprodCursor(id, descr, price, btw))
+	
+	Return lst
+End Sub
+
+Public Sub DeleteProduct(id As String)
+	DbInitalized
+	qry = "DELETE FROM artikel WHERE id=?"
+	sql.ExecNonQuery2(qry, Array as String(id))
+	
+End Sub
+
+Public Sub GetAllProducts As List
+	DbInitalized
+	Dim lstObj As List
+	qry = "SELECT * FROM artikel ORDER BY omschrijving"
+	curs = sql.ExecQuery(qry)
+	
+	lstObj.Initialize
+	For i = 0 To curs.RowCount -1
+		curs.Position = i
+		lstObj.Add(CreateprodCursor(curs.GetString("id"), curs.GetString("omschrijving"), curs.GetString("prijs_ex_btw"), curs.GetString("btw_perc")))
+	Next
+	Return lstObj
+End Sub
+
+
+Public Sub CreateprodCursor (id As String, description As String, price As String, btw As String) As prodCursor
+	Dim t1 As prodCursor
+	t1.Initialize
+	t1.id = id
+	t1.description = description
+	t1.price = price
+	t1.btw = btw
+	Return t1
+End Sub
 #End Region
 
 Sub UUIDv4 As String
@@ -85,3 +153,19 @@ Sub UUIDv4 As String
 	Return sb.ToString.ToLowerCase
 End Sub
 
+#Region CreateUpdateTable
+Public Sub CheckArticleTableExists
+	DbInitalized
+	qry = $"CREATE TABLE IF NOT EXISTS artikel
+		(
+			"id"	TEXT UNIQUE,
+			"omschrijving"	TEXT,
+			"btw_perc"	NUMERIC,
+			"prijs_ex_btw"	NUMERIC,
+			"btw_id"	TEXT,
+			PRIMARY KEY("id")
+		)"$
+	
+	sql.ExecNonQuery(qry)
+End Sub
+#End Region

@@ -21,6 +21,7 @@ Sub Class_Globals
 	
 	Dim appMenu As appSetting
 	Type btwCursor(id As String, description As String, rate As String)
+	Type prodCursor(id As String, description As String, price As String, btw as String)
 End Sub
 
 Public Sub Initialize
@@ -56,6 +57,8 @@ Sub CheckPasswordLength(pw As String) As Boolean
 	btnContinue.Enabled = enable
 	Return enable
 End Sub
+
+
 
 
 

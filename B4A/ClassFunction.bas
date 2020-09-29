@@ -39,8 +39,10 @@ End Sub
 Public Sub PrefDialogCustom(p As PreferencesDialog)
 	For i = 0 To p.PrefItems.Size - 1
 		'Dim pi As B4XPrefItem = p.PrefItems.Get(i)
-		
 		Dim ft As B4XFloatTextField = p.CustomListView1.GetPanel(i).GetView(0).Tag
+		If ft = Null Then Continue
+
+		ft.AnimationDuration = 0
 		ft.TextField.Font = xui.CreateDefaultFont(20)
 		ft.SmallLabelTextSize = 20
 		ft.NonFocusedHintColor = Colors.Blue
@@ -48,3 +50,11 @@ Public Sub PrefDialogCustom(p As PreferencesDialog)
 		ft.Update
 	Next
 End Sub
+
+'Is device a tablet
+Public Sub GetDevicePhysicalSize As Float
+	Dim lv As LayoutValues
+	lv = GetDeviceLayoutValues
+	Return Sqrt(Power(lv.Height / lv.Scale / 160, 2) + Power(lv.Width / lv.Scale / 160, 2))
+End Sub
+

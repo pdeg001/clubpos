@@ -11,6 +11,7 @@ Sub Class_Globals
 	Private btnArtikel As B4XView
 	
 	Private btw As BtwInvoer
+	Private products As product
 End Sub
 
 'You can add more parameters here.
@@ -25,6 +26,8 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	
 	btw.Initialize
 	B4XPages.AddPage("btw", btw)
+	products.Initialize
+	B4XPages.AddPage("product", products)
 End Sub
 
 'You can see the list of page related events in the B4XPagesManager object. The event name is B4XPage.
@@ -34,5 +37,5 @@ Sub btnBtw_Click
 End Sub
 
 Sub btnArtikel_Click
-	
+	B4XPages.ShowPage("product")
 End Sub
