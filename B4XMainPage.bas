@@ -21,7 +21,7 @@ Sub Class_Globals
 	
 	Dim appMenu As appSetting
 	Type btwCursor(id As String, description As String, rate As String)
-	Type prodCursor(id As String, description As String, price As String, btw as String)
+	Type prodCursor(id As String, description As String, price As String, btw As String)
 End Sub
 
 Public Sub Initialize
@@ -38,6 +38,11 @@ Private Sub B4XPage_Created (Root1 As B4XView)
 	password.RequestFocusAndShowKeyboard
 	B4XPages.ShowPage("appMenu")
 End Sub
+
+Sub Activity_Resume
+'	Log("PPP")
+End Sub
+
 
 'You can see the list of page related events in the B4XPagesManager object. The event name is B4XPage.
 
@@ -57,8 +62,4 @@ Sub CheckPasswordLength(pw As String) As Boolean
 	btnContinue.Enabled = enable
 	Return enable
 End Sub
-
-
-
-
 

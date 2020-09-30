@@ -13,6 +13,7 @@ Sub Class_Globals
 	Private clsDb As DbUtils
 	Private clsFunc As ClassFunction
 	Private editRate As Boolean
+	Private editRateValue As String
 	Private rateId As String
 	Private selectedPanelIndex As Int
 	
@@ -27,6 +28,9 @@ Sub Class_Globals
 	Private lblEdit As B4XView
 	Private lblDelete As Label
 	Private txtDescription As B4XFloatTextField
+	Private pnlAddRate As Panel
+	Private edtDescription As EditText
+	Private edtRate As EditText
 End Sub
 
 'You can add more parameters here.
@@ -79,7 +83,17 @@ Sub ProcessBtw (OptionsPassed As Map)
 			lst.Add(options.Get(key))
 		End If
 	Next
-	
+
+	If lst.Get(1) <> editRateValue Then
+		If CheckIfRateExists(lst.Get(1)) Then
+			Msgbox2Async("Tarief be", "Title", "Yes", "Cancel", "No", Null, False)
+			Wait For Msgbox_Result (Result As Int)
+			If Result = DialogResponse.POSITIVE Then
+				'...
+			End If
+		End If
+	End If
+
 	If editRate Then
 		ProcessEditRate(lst)
 		editRate = False
@@ -88,6 +102,10 @@ Sub ProcessBtw (OptionsPassed As Map)
 		btwRow = lstData.Get(0)
 		clvBtwTarief.Add(GenBtwList(btwRow), "")
 	End If
+End Sub
+
+Sub CheckIfRateExists(rate As String) As Boolean
+	Return clsDb.CheckIfRateExists(rate)
 End Sub
 
 Sub ProcessEditRate(lst As List)
@@ -121,7 +139,8 @@ Sub GenBtwList(lst As List) As Panel
 End Sub
 
 Sub IME_HeightChanged (NewHeight As Int, OldHeight As Int)
-	prefdialog.KeyboardHeightChanged(NewHeight)
+	'prefdialog.KeyboardHeightChanged(NewHeight)
+	
 End Sub
 
 Sub Button1_Click
@@ -162,20 +181,25 @@ Sub lblEdit_Click
 			Return
 		End If
 	End If
+	edtDescription.Text = descr
+	edtRate.Text = rate
 	
-	options.Initialize
-	options = CreateMap("btw_omschrijving":descr,"btw_tarief":rate)
+	pnlAddRate.SetLayoutAnimated(100, 0dip, 5dip, 100%X, 100%Y)
 	
-	InitPrefDialog
-	
-	Dim sf As Object = prefdialog.ShowDialog(options, "OKE", "ANNULEER")
-	clsFunc.PrefDialogCustom(prefdialog)
-
-	Wait For (sf) Complete (Result As Int)
-	
-	If Result = xui.DialogResponse_Positive Then
-		ProcessBtw(options)
-	End If
+'	editRateValue = rate
+'	options.Initialize
+'	options = CreateMap("btw_omschrijving":descr,"btw_tarief":rate)
+'	
+'	InitPrefDialog
+'	
+'	Dim sf As Object = prefdialog.ShowDialog(options, "OKE", "ANNULEER")
+'	clsFunc.PrefDialogCustom(prefdialog)
+'
+'	Wait For (sf) Complete (Result As Int)
+'	
+'	If Result = xui.DialogResponse_Positive Then
+'		ProcessBtw(options)
+'	End If
 End Sub
 
 Sub InitPrefDialog
@@ -188,4 +212,16 @@ Sub InitPrefDialog
 	'prefdialog.Initialize(Root, "BTW Tarieven", 300dip, 300dip)
 	prefdialog.Initialize(Root, "BTW Tarieven", dip, 300dip)
 	prefdialog.LoadFromJson(File.ReadString(File.DirAssets, "btw.json"))
+End Sub
+
+Sub pnlAddRate_Click
+	
+End Sub
+
+Sub btnOke_Click
+	
+End Sub
+
+Sub btnCancel_Click
+	pnlAddRate.SetLayoutAnimated(100, 0dip, 1500dip, 100%X, 100%Y)
 End Sub

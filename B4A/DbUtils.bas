@@ -6,6 +6,7 @@ Version=10.2
 @EndOfDesignText@
 Sub Class_Globals
 	Private sql As SQL
+	Private rs As ResultSet
 	Private curs As Cursor
 	Private qry As String
 End Sub
@@ -44,10 +45,12 @@ Public Sub GetBtw As List
 	curs = sql.ExecQuery(qry)
 	
 	lst.Initialize
+	Starter.lstBtw.Initialize
 	
 	For i = 0 To curs.RowCount -1
 		curs.Position = i
 		lst.Add(Array As String(curs.GetString("id"), curs.GetString("omschrijving"), curs.GetString("tarief")))
+		Starter.lstBtw.Add(CreatebtwCursor(curs.GetString("id"), curs.GetString("omschrijving"), curs.GetString("tarief")))
 	Next
 	
 	curs.Close
@@ -71,22 +74,71 @@ Public Sub GetAllBtwForAddProduct
 	
 	DbInitalized
 	
-	qry = "SELECT omschrijving FROM btw_tarief ORDER BY tarief"
+	qry = "SELECT omschrijving, tarief FROM btw_tarief ORDER BY tarief"
 	curs = sql.ExecQuery(qry)
+	
+	Starter.btwRate.Initialize
 	
 	For i = 0 To curs.RowCount -1
 		curs.Position = i
 		If i < curs.RowCount Then
-			btw = btw &curs.GetString("omschrijving")&CRLF
+			btw = btw &curs.GetString("tarief")&CRLF
 		Else
-			btw = btw &curs.GetString("omschrijving")
+			btw = btw &curs.GetString("tarief")
 		End If
 		
 	Next
 	File.WriteString(Main.filePath, "btw.txt", btw)
+	curs.Close
 	Sleep(100)
 End Sub
 
+Public Sub GetBtwId(btw As String) As String
+	Dim id As String
+	DbInitalized
+	qry = "SELECT id FROM btw_tarief WHERE omschrijving=?"
+	curs = sql.ExecQuery2(qry, Array As String(btw))
+	If curs.RowCount = 0 Then
+		id = ""
+	Else
+		curs.Position = 0
+		id = curs.GetString("id")
+	End If
+	curs.Close
+	Return id
+End Sub
+
+Public Sub GetBtwPerc(id As String) As Float
+	Dim rate As Float
+	DbInitalized
+	qry = "SELECT tarief FROM btw_tarief WHERE id=?"
+	curs = sql.ExecQuery2(qry, Array As String(id))
+	If curs.RowCount = 0 Then
+		rate = 0
+	Else
+		curs.Position = 0
+		rate = curs.GetString("tarief")	
+	End If
+	curs.Close
+	Return rate
+End Sub
+
+Public Sub CheckIfRateExists(rate As String) As Boolean
+	DbInitalized
+	qry = "SELECT COUNT(*) FROM btw_tarief WHERE tarief=?"
+	curs = sql.ExecQuery2(qry, Array As String(rate))
+	
+	Return curs.RowCount > 0
+End Sub
+
+Public Sub CreatebtwCursor (id As String, description As String, rate As String) As btwCursor
+	Dim t1 As btwCursor
+	t1.Initialize
+	t1.id = id
+	t1.description = description
+	t1.rate = rate
+	Return t1
+End Sub
 #End Region
 
 #Region PRODUCT
@@ -104,17 +156,55 @@ Public Sub AddProduct(descr As String, price As String, btw As String) As List
 	Return lst
 End Sub
 
+Public Sub UpdateProduct(id As String, descr As String, price As String, btw As String) As List
+	DbInitalized
+	Dim lst As List
+	qry = "UPDATE artikel SET omschrijving=?, prijs_ex_btw=?, btw_perc=? WHERE id=?"
+	sql.ExecNonQuery2(qry, Array As String(descr, price, btw, id))
+	
+'	qry = $"Select a.id as id
+'			,a.omschrijving as omschrijving
+'			,b.tarief as btw_perc
+'			,a.prijs_ex_btw as prijs_ex_btw 
+'			FROM artikel a
+'			INNER join btw_tarief b on
+'			b.id = a.btw_perc
+'			WHERE a.id=?"$
+'	curs = sql.ExecQuery2(qry, Array As String(id))
+'	
+'	curs.Position = 0		
+	lst.Initialize
+	'lst.Add(CreateprodCursor(curs.GetString("id"), curs.GetString("omschrijving"), curs.GetString("prijs_ex_btw"), curs.GetString("btw_perc")))
+	lst.Add(CreateprodCursor(id, descr, price, btw))
+	curs.Close
+	Return lst
+End Sub
+
+Public Sub GetBtwById(id As String) As String
+	Dim id As String
+	DbInitalized
+	qry = "SELECT tarief FROM btw_tarief WHERE id=?"
+	curs = sql.ExecQuery2(qry, Array As String(id))
+	id = curs.GetString("id")
+	Return id
+End Sub
+
 Public Sub DeleteProduct(id As String)
 	DbInitalized
 	qry = "DELETE FROM artikel WHERE id=?"
-	sql.ExecNonQuery2(qry, Array as String(id))
-	
+	sql.ExecNonQuery2(qry, Array As String(id))
 End Sub
 
 Public Sub GetAllProducts As List
 	DbInitalized
 	Dim lstObj As List
-	qry = "SELECT * FROM artikel ORDER BY omschrijving"
+	qry = $"Select a.id as id
+			,a.omschrijving as omschrijving
+			,b.tarief as btw_perc
+			,a.prijs_ex_btw as prijs_ex_btw 
+			FROM artikel a
+			INNER join btw_tarief b on
+			b.id = a.btw_perc"$
 	curs = sql.ExecQuery(qry)
 	
 	lstObj.Initialize
@@ -122,8 +212,11 @@ Public Sub GetAllProducts As List
 		curs.Position = i
 		lstObj.Add(CreateprodCursor(curs.GetString("id"), curs.GetString("omschrijving"), curs.GetString("prijs_ex_btw"), curs.GetString("btw_perc")))
 	Next
+	curs.Close
 	Return lstObj
 End Sub
+
+
 
 
 Public Sub CreateprodCursor (id As String, description As String, price As String, btw As String) As prodCursor

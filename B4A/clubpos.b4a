@@ -114,6 +114,7 @@ End Sub
 
 Sub Activity_Resume
 	B4XPages.Delegate.Activity_Resume
+	B4XPages.MainPage.Activity_Resume
 End Sub
 
 Sub Activity_Pause (UserClosed As Boolean)
